@@ -33,14 +33,20 @@ class ApplesController extends \yii\web\Controller
     }
 
 
-    public function actionSnakeTree(){
+    public function actionShakeTree(){
         if (Yii::$app->request->isAjax) {
             //Ищем яблоки на дереве и рандомно роняем их
             $apples_on_tree  = Apples::findAll([
                     'status' =>  Apples::STATUS_ON_TREE,
                 ]);
 
-            //TODO Не доделано
+            foreach ($apples_on_tree as $item){
+                if(rand(0, 1)){
+                    $item->date_fall = date('Y-m-d H:i:s', strtotime("now"));
+                    $item->status = Apples::STATUS_ON_GROUND;
+                    $item->save();
+                }
+            }
 
             return $this->renderGrid();
         }
@@ -60,6 +66,10 @@ class ApplesController extends \yii\web\Controller
             return $this->renderGrid();
         }
 
+    }
+
+    public function actionDelete($id){
+        if ($apple = Apples::findOne($id)) $apple->delete();
     }
 
 }
