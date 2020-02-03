@@ -14,7 +14,7 @@ class m200129_021531_create_apples_table extends Migration
     {
         $this->createTable('{{%apples}}', [
             'id' => $this->primaryKey(),
-            'date_create' => $this->timestamp(),
+            'date_create' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'color' => $this->string(15),
             'body_percent' => $this->tinyInteger()->defaultValue(100),
             'status' => $this->string(10),

@@ -22,17 +22,6 @@ class ApplesController extends \yii\web\Controller
         ]);
     }
 
-    private function renderGrid(){
-        $searchModel = new ApplesSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->renderPartial('_grid', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-
     public function actionShakeTree(){
         if (Yii::$app->request->isAjax) {
             //Ищем яблоки на дереве и рандомно роняем их
@@ -48,7 +37,7 @@ class ApplesController extends \yii\web\Controller
                 }
             }
 
-            return $this->renderGrid();
+            return $this->redirect(['index']);
         }
     }
 
@@ -56,20 +45,37 @@ class ApplesController extends \yii\web\Controller
         if (Yii::$app->request->isAjax) {
             for ($i = 0; $i < 30; $i++)
                 Apples::createByRandom()->save();
-            return $this->renderGrid();
         }
+
+        return $this->redirect(['index']);
     }
 
     public function actionDeleteAll(){
         if (Yii::$app->request->isAjax) {
             Apples::deleteAll();
-            return $this->renderGrid();
         }
-
+        return $this->redirect(['index']);
     }
 
     public function actionDelete($id){
         if ($apple = Apples::findOne($id)) $apple->delete();
+        return $this->redirect(['index']);
     }
 
+    public function actionUp($id){
+        if ($apple = Apples::findOne($id)){
+            $apple->date_up = date('Y-m-d H:i:s');
+            $apple->status = Apples::STATUS_ON_UP;
+            $apple->save();
+        }
+        return $this->redirect(['index']);
+    }
+
+    public function actionEat($id, $percent){
+        if ($apple = Apples::findOne($id)){
+            $apple->body_percent -= $percent;
+            $apple->save();
+        }
+        return $this->redirect(['index']);
+    }
 }
