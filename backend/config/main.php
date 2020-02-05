@@ -15,7 +15,6 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
-            'baseUrl' => '/backend',//Для запуска бека и фронта на одном сервере. Предварительно сделана символическая ссылка на /backend/web
         ],
         'user' => [
             'identityClass' => 'common\models\User',

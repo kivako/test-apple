@@ -4,13 +4,37 @@ namespace backend\controllers;
 
 
 use Yii;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Response;
 use app\models\Apples;
 use app\models\ApplesSearch;
+use backend\models\ApplesEatForm;
+use yii\base\Exception;
 
 
 class ApplesController extends \yii\web\Controller
 {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+
     public function actionIndex()
     {
         $searchModel = new ApplesSearch();
@@ -37,7 +61,7 @@ class ApplesController extends \yii\web\Controller
                 }
             }
 
-            return $this->redirect(['index']);
+            return $this->actionIndex();
         }
     }
 
@@ -47,19 +71,19 @@ class ApplesController extends \yii\web\Controller
                 Apples::createByRandom()->save();
         }
 
-        return $this->redirect(['index']);
+        return $this->actionIndex();
     }
 
     public function actionDeleteAll(){
         if (Yii::$app->request->isAjax) {
             Apples::deleteAll();
         }
-        return $this->redirect(['index']);
+        return $this->actionIndex();
     }
 
     public function actionDelete($id){
         if ($apple = Apples::findOne($id)) $apple->delete();
-        return $this->redirect(['index']);
+        return $this->actionIndex();
     }
 
     public function actionUp($id){
@@ -68,14 +92,23 @@ class ApplesController extends \yii\web\Controller
             $apple->status = Apples::STATUS_ON_UP;
             $apple->save();
         }
-        return $this->redirect(['index']);
+        return $this->actionIndex();
     }
 
-    public function actionEat($id, $percent){
-        if ($apple = Apples::findOne($id)){
-            $apple->body_percent -= $percent;
-            $apple->save();
+    public function actionEat($id){
+
+        $model = new ApplesEatForm();
+
+        if (!$apple = Apples::findOne($id))
+            throw new Exception('Apples ID not found');
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+                    $apple->body_percent -= $model->percent;
+                    $apple->save();
+            //return $this->actionIndex();
+            return $this->redirect(['index']);
+        } else {
+            return $this->renderPartial('_from_eat', ['model' => $model, 'current_percent' => $apple->body_percent]);
         }
-        return $this->redirect(['index']);
     }
 }

@@ -26,6 +26,8 @@ class m130524_201442_init extends Migration
         ], $tableOptions);
     }
 
+
+
     public function down()
     {
         $this->dropTable('{{%user}}');
