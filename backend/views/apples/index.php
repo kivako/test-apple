@@ -9,9 +9,8 @@ use \app\models\Apples;
 
 ?>
 
-<?php Pjax::begin(); ?>
+<?php Pjax::begin(['enablePushState' => false]); ?>
 <p>
-    <?= Html::a('Создать...', ['create'], ['class' => 'btn btn-success']) ?>
     <?= Html::a('Генерировать Яблоки', ['apples/generate'], ['title' => 'Рандомно создаем 30 яблок' ,'class' => 'btn btn-primary']) ?>
     <?= Html::a('Потрясти дерево', ['apples/shake-tree', 'data-pjax' => 1], ['title' => 'Если потрясти дерево, несколько яблок упадут на землю','class' => 'btn btn-warning']) ?>
     <?= Html::a('Удалить все Яблоки', ['apples/delete-all'], ['class' => 'btn btn-danger']) ?>
