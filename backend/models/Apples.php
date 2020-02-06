@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\base\Exception;
 
 /**
  * This is the model class for table "apples".
@@ -58,8 +59,6 @@ class Apples extends \yii\db\ActiveRecord
     {
         return [
             [['date_create', 'date_fall' ,'date_up','body_percent', 'color', 'status'], 'safe'],
-            //[['body_percent'], 'integer'],
-            //[['color', 'status'], 'string', 'max' => 10],
         ];
     }
 
@@ -79,8 +78,8 @@ class Apples extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function createByRandom() {
 
+    public static function createByRandom() {
 
         $obj = new Apples();
         $obj->date_create = date('Y-m-d H:i:s', rand( strtotime("-1 day"), strtotime("now")));
@@ -101,4 +100,41 @@ class Apples extends \yii\db\ActiveRecord
 
         return $obj;
     }
+
+    //Падаем на землю
+    public function fallToGround(){
+        if ($this->status == self::STATUS_ON_TREE){
+            $this->date_fall = date('Y-m-d H:i:s');
+            $this->status = self::STATUS_ON_GROUND;
+            $this->save();
+        }else{
+            throw new Exception('Яблоко может упасть только если оно находится на дереве!');
+        }
+    }
+
+    //Поднимаем с земли
+    public function up(){
+        if ($this->status == self::STATUS_ON_GROUND){
+            $this->date_up = date('Y-m-d H:i:s');
+            $this->status = self::STATUS_ON_UP;
+            $this->save();
+        }else{
+            throw new Exception('Яблоко можно поднять только лежащее на земле!');
+        }
+    }
+
+    //Кушаем яблоко
+    public function eat($percent){
+        if ($this->status == self::STATUS_ON_UP){
+            $this->body_percent -= $percent;
+            if ($this->body_percent <= 0 ){
+                $this->delete();
+            } else{
+                $this->save();
+            }
+        }else{
+            throw new Exception('Яблоко можно кушать только поднятое с земли!');
+        }
+    }
+
 }

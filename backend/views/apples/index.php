@@ -6,7 +6,6 @@ use yii\widgets\Pjax;
 use yii\grid\GridView;
 use kartik\datetime\DateTimePicker;
 use \app\models\Apples;
-use yii\bootstrap\Modal;
 
 ?>
 
@@ -78,7 +77,10 @@ use yii\bootstrap\Modal;
                     ]);
                 },
                 'up' => function ($url, $model) {
-                    return Html::a( 'Поднять', ['apples/up', 'id' => $model->id], ['title' => 'Поднять упавшее яблоко']);
+                    return Html::a( 'Поднять', ['apples/up', 'id' => $model->id], [
+                            'title' => 'Поднять упавшее яблоко',
+                            'data-pjax' => '1'
+                    ]);
                 },
                 'delete' => function ($url, $model, $key)
                     {
@@ -99,7 +101,7 @@ use yii\bootstrap\Modal;
                     return $data->status == Apples::STATUS_ON_GROUND;
                 },
             ],
-            'template' => '{eat} {up} {view} {update} {delete}',
+            'template' => '{eat} {up} {view} {delete}',
         ],
     ],
 ]);?>

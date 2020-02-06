@@ -5,8 +5,6 @@ namespace backend\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
-use yii\web\Response;
 use app\models\Apples;
 use app\models\ApplesSearch;
 use backend\models\ApplesEatForm;
@@ -55,9 +53,7 @@ class ApplesController extends \yii\web\Controller
 
             foreach ($apples_on_tree as $item){
                 if(rand(0, 1)){
-                    $item->date_fall = date('Y-m-d H:i:s', strtotime("now"));
-                    $item->status = Apples::STATUS_ON_GROUND;
-                    $item->save();
+                    $item->fallToGround();
                 }
             }
 
@@ -88,9 +84,7 @@ class ApplesController extends \yii\web\Controller
 
     public function actionUp($id){
         if ($apple = Apples::findOne($id)){
-            $apple->date_up = date('Y-m-d H:i:s');
-            $apple->status = Apples::STATUS_ON_UP;
-            $apple->save();
+            $apple->up();
         }
         return $this->actionIndex();
     }
@@ -103,12 +97,17 @@ class ApplesController extends \yii\web\Controller
             throw new Exception('Apples ID not found');
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-                    $apple->body_percent -= $model->percent;
-                    $apple->save();
-            //return $this->actionIndex();
+                    $apple->eat($model->percent);
             return $this->redirect(['index']);
         } else {
             return $this->renderPartial('_from_eat', ['model' => $model, 'current_percent' => $apple->body_percent]);
         }
+    }
+
+    public function actionView($id)
+    {
+        return $this->render('view', [
+            'model' => Apples::findOne($id)
+        ]);
     }
 }
